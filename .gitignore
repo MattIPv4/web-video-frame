@@ -1,5 +1,12 @@
 .idea/
 .vscode/
-node_modules/
-tmp/
 .DS_store
+
+node_modules/
+
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+tmp/

@@ -2,8 +2,12 @@ const create = (src: string) => {
     const video = document.createElement("video");
     video.controls = true;
     video.preload = "auto";
-    video.src = src;
 
+    const source = document.createElement("source");
+    source.src = src;
+    source.type = "video/mp4";
+
+    video.appendChild(source);
     document.body.appendChild(video);
     return video;
 };
@@ -20,5 +24,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!src) return;
 
     const video = create(src);
-    (window as any).test = { video, frame: () => frame(video) };
+    (window as any).test = () => frame(video);
 });

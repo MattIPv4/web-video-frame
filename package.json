@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "generate": "tsx src/index.ts",
+    "serve": "http-server tmp -p 3000"
   },
   "keywords": [],
   "author": "Matt (IPv4) Cowley",
@@ -12,6 +13,7 @@
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@playwright/test": "^1.48.1",
     "tmp-promise": "^3.0.3",
     "tsup": "^8.3.0",
     "tsx": "^4.19.1",
