@@ -1,5 +1,12 @@
 import { exec as execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { readFile, writeFile } from "node:fs/promises";
+
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
+import { dir, setGracefulCleanup } from "tmp-promise";
+import { build } from "tsup";
+
+setGracefulCleanup();
 
 const mod = (a: number, b: number) => ((a % b) + b) % b;
 
@@ -61,4 +68,16 @@ export const frame = (frame: number, width: number, height: number) => {
   }
 
   return pixels;
+};
+
+export const html = async (output: string) => {
+  const { path } = await dir({ unsafeCleanup: true });
+  await build({
+      entryPoints: [fileURLToPath(new URL("./player.ts", import.meta.url))],
+      format: ["cjs"],
+      minify: true,
+      outDir: path,
+  });
+  const js = await readFile(`${path}/player.cjs`, "utf-8");
+  await writeFile(output, `<html><body><script>${js}</script></body></html>`);
 };

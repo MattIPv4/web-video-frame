@@ -12,7 +12,10 @@
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "tsx": "^4.19.1"
+    "tmp-promise": "^3.0.3",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@types/node": "^22.7.9"
