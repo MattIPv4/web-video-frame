@@ -18,7 +18,7 @@ const exec = (command: string) =>
       });
     });
 
-export const video = async (frames: number, width: number, height: number, output: string, rate: number = 25) => {
+export const video = async (frames: number, width: number, height: number, rate: number, output: string) => {
     const command = [
         `"${ffmpeg.path}"`,
         "-f",

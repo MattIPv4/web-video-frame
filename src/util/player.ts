@@ -12,11 +12,27 @@ const create = (src: string) => {
     return video;
 };
 
-const frame = (video: HTMLVideoElement) => new Promise(resolve => {
-    video.requestVideoFrameCallback((now, metadata) => {
-        resolve(metadata.mediaTime);
-    })
-});
+const metadata = (video: HTMLVideoElement) => {
+    const promise = new Promise(resolve => {
+        video.requestVideoFrameCallback((now, metadata) => {
+            resolve(metadata);
+        })
+    });
+    if (video.paused) video.currentTime += Number.EPSILON;
+    return promise;
+};
+
+const frame = (video: HTMLVideoElement) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("2d context not supported");
+    
+    context.drawImage(video, 0, 0);
+    return Array.from(context.getImageData(0, 0, canvas.width, canvas.height).data);
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     const query = new URLSearchParams(window.location.search);
@@ -24,5 +40,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!src) return;
 
     const video = create(src);
-    (window as any).test = () => frame(video);
+    (window as any).test = { metadata: () => metadata(video), frame: () => frame(video) };
 });
