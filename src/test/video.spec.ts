@@ -36,8 +36,10 @@ const evaluate = async (page: any, frame: number) => {
   await expect(compare(actual[width * 5 + 5], expected[width * 5 + 5])).toBe(true);
 };
 
+test.setTimeout(120_000);
 test("requestVideoFrameCallback mediaTime", async ({ page }) => {
-  test.setTimeout(120_000);
+  await page.goto("/?src=200x640x480x25.mp4");
+
 
   const video = await page.locator("video");
   await expect(video).toBeVisible();
@@ -52,8 +54,9 @@ test("requestVideoFrameCallback mediaTime", async ({ page }) => {
   }
 });
 
+test.setTimeout(120_000);
 test("HTMLVideoElement currentTime", async ({ page }) => {
-  test.setTimeout(120_000);
+  await page.goto("/?src=200x640x480x25.mp4");
 
   const video = await page.locator("video");
   await expect(video).toBeVisible();
@@ -65,5 +68,27 @@ test("HTMLVideoElement currentTime", async ({ page }) => {
 
     const currentTime = await video.evaluate(node => (node as HTMLVideoElement).currentTime);
     await evaluate(page, Math.round(currentTime * rate));
+  }
+});
+
+test("HTMLVideoElement currentTime & slowed", async ({ page, browserName }) => {
+  await page.goto("/?src=1250x640x480x25x10.mp4");
+
+  const video = await page.locator("video");
+  await expect(video).toBeVisible();
+  
+  for (let i = 0; i < 30; i++) {
+    await video.evaluate(node => (node as HTMLVideoElement).play());
+    await page.waitForTimeout(500);
+    await video.evaluate(node => (node as HTMLVideoElement).pause());
+    await page.waitForTimeout(500);
+
+
+    const currentTime = await video.evaluate(node => (node as HTMLVideoElement).currentTime);
+    const currentFrame = Math.floor(currentTime * rate);
+    const scaledFrame = Math.floor(currentFrame / 10) + 1;
+    console.log({ currentTime, currentFrame, scaledFrame });
+    await page.screenshot({ path: `tmp/${browserName}/${i}-${scaledFrame}.png` });
+    // await evaluate(page, scaledFrame);
   }
 });

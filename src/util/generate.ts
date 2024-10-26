@@ -1,4 +1,5 @@
 import { exec as execSync } from "node:child_process";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile, writeFile } from "node:fs/promises";
 
@@ -18,7 +19,7 @@ const exec = (command: string) =>
       });
     });
 
-export const video = async (frames: number, width: number, height: number, rate: number, output: string) => {
+export const video = async (frames: number, width: number, height: number, rate: number, output: string, factor: number = 1) => {
     const command = [
         `"${ffmpeg.path}"`,
         "-f",
@@ -26,10 +27,10 @@ export const video = async (frames: number, width: number, height: number, rate:
         "-i",
         `nullsrc=size=${width}x${height}:rate=${rate}:duration=${frames / rate}`,
         "-vf",
-        "\"geq=" +
-            "r='mod(floor(X*10/W)*10 + floor(Y*10/H)*15 + N*40, 256)':" +
-            "g='mod(floor(X*10/W)*20 + floor(Y*10/H)*25 + N*45, 256)':" +
-            "b='mod(floor(X*10/W)*30 + floor(Y*10/H)*35 + N*50, 256)'\"",
+        '"geq=' +
+        `r='mod(floor(X*10/W)*10 + floor(Y*10/H)*15 + floor(N/${factor})*40, 256)':` +
+        `g='mod(floor(X*10/W)*20 + floor(Y*10/H)*25 + floor(N/${factor})*45, 256)':` +
+        `b='mod(floor(X*10/W)*30 + floor(Y*10/H)*35 + floor(N/${factor})*50, 256)'\"`,
         "-c:v",
         "libx264",
         "-pix_fmt",
@@ -44,6 +45,24 @@ export const video = async (frames: number, width: number, height: number, rate:
         throw error;
     });
 };
+
+export const frames = async (video: string, rate: number, output: string) => {
+  const command = [
+    `"${ffmpeg.path}"`,
+    "-i",
+    `"${join(process.cwd(), video)}"`,
+    "-vf",
+    `fps=${rate}`,
+    `"${join(process.cwd(), output)}/frame_%03d.png"`,
+  ].join(" ");
+  await exec(command).catch(({ error, stdout, stderr }) => {
+    console.error("ffmpeg command failed:", command);
+    console.error("stdout:", stdout);
+    console.error("stderr:", stderr);
+    throw error;
+  });
+};
+
 
 export const frame = (frame: number, width: number, height: number) => {
   const pixels: { r: number; g: number; b: number }[] = [];

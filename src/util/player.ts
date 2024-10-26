@@ -7,6 +7,30 @@ const create = (src: string) => {
     source.src = src;
     source.type = "video/mp4";
 
+    const factor = 10;
+    const rate = 25;
+    const frameDuration = factor / rate;
+
+    // Handler for snapping the time
+    const snapTimeHandler = () => {
+      console.log(`Current time: ${video.currentTime}`);
+      const bottomOfFrame =
+        Math.floor(video.currentTime / frameDuration) * frameDuration;
+      const targetTime = bottomOfFrame + frameDuration / 2;
+      console.log(`Target time: ${targetTime}`);
+      const difference = Math.abs(video.currentTime - targetTime);
+      console.log(`Difference: ${difference}`);
+      if (difference <= 0.01) {
+        console.log(`No difference`);
+        return;
+      }
+      video.currentTime = targetTime;
+    };
+
+    video.addEventListener("seeked", snapTimeHandler);
+    video.addEventListener("pause", snapTimeHandler);
+
+
     video.appendChild(source);
     document.body.appendChild(video);
     return video;
