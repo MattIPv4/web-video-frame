@@ -1,13 +1,13 @@
-const create = (src: string) => {
+const create = (src: string, factor: number) => {
     const video = document.createElement("video");
     video.controls = true;
     video.preload = "auto";
+    video.playbackRate = factor;
 
     const source = document.createElement("source");
     source.src = src;
     source.type = "video/mp4";
 
-    const factor = 10;
     const rate = 25;
     const frameDuration = factor / rate;
 
@@ -61,8 +61,9 @@ const frame = (video: HTMLVideoElement) => {
 document.addEventListener("DOMContentLoaded", () => {
     const query = new URLSearchParams(window.location.search);
     const src = query.get("src");
+    const factor = query.get("factor");
     if (!src) return;
 
-    const video = create(src);
+    const video = create(src, factor ? parseInt(factor) : 1);
     (window as any).test = { metadata: () => metadata(video), frame: () => frame(video) };
 });

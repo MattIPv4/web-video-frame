@@ -29,8 +29,8 @@ export const video = async (frames: number, width: number, height: number, rate:
         "-vf",
         '"geq=' +
         `r='mod(floor(X*10/W)*10 + floor(Y*10/H)*15 + floor(N/${factor})*40, 256)':` +
-        `g='mod(floor(X*10/W)*20 + floor(Y*10/H)*25 + floor(N/${factor})*45, 256)':` +
-        `b='mod(floor(X*10/W)*30 + floor(Y*10/H)*35 + floor(N/${factor})*50, 256)'\"`,
+        `g='mod(floor(X*10/W)*30 + floor(Y*10/H)*25 + floor(N/${factor})*50, 256)':` +
+        `b='mod(floor(X*10/W)*60 + floor(Y*10/H)*35 + floor(N/${factor})*60, 256)'\"`,
         "-c:v",
         "libx264",
         "-pix_fmt",
@@ -74,11 +74,11 @@ export const frame = (frame: number, width: number, height: number) => {
         256
       );
       const g = mod(
-        Math.floor((x * 10) / width) * 20 + Math.floor((y * 10) / height) * 25 + frame * 45,
+        Math.floor((x * 10) / width) * 30 + Math.floor((y * 10) / height) * 25 + frame * 50,
         256
       );
       const b = mod(
-        Math.floor((x * 10) / width) * 30 + Math.floor((y * 10) / height) * 35 + frame * 50,
+        Math.floor((x * 10) / width) * 60 + Math.floor((y * 10) / height) * 35 + frame * 60,
         256
       );
 

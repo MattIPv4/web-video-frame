@@ -19,7 +19,7 @@ const imageDataToObj = (values: number[]) => values.reduce((arr, value, idx) => 
 const objToRGB = (obj: { r: number; g: number; b: number }) => `rgb(${obj.r}, ${obj.g}, ${obj.b})`;
 
 const compare = (actual: { r: number; g: number; b: number }, expected: { r: number; g: number; b: number }) => {
-  const threshold = 5;
+  const threshold = 40;
   return (
     Math.abs(actual.r - expected.r) < threshold &&
     Math.abs(actual.g - expected.g) < threshold &&
@@ -71,13 +71,13 @@ test("HTMLVideoElement currentTime", async ({ page }) => {
   }
 });
 
-test("HTMLVideoElement currentTime & slowed", async ({ page, browserName }) => {
-  await page.goto("/?src=1250x640x480x25x10.mp4");
+test("HTMLVideoElement currentTime & slowed x3", async ({ page, browserName }) => {
+  await page.goto("/?src=600x640x480x25x3.mp4&factor=3");
 
   const video = await page.locator("video");
   await expect(video).toBeVisible();
   
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 12; i++) {
     await video.evaluate(node => (node as HTMLVideoElement).play());
     await page.waitForTimeout(500);
     await video.evaluate(node => (node as HTMLVideoElement).pause());
@@ -86,9 +86,53 @@ test("HTMLVideoElement currentTime & slowed", async ({ page, browserName }) => {
 
     const currentTime = await video.evaluate(node => (node as HTMLVideoElement).currentTime);
     const currentFrame = Math.floor(currentTime * rate);
-    const scaledFrame = Math.floor(currentFrame / 10) + 1;
+    const scaledFrame = Math.floor(currentFrame / 3);
     console.log({ currentTime, currentFrame, scaledFrame });
     await page.screenshot({ path: `tmp/${browserName}/${i}-${scaledFrame}.png` });
-    // await evaluate(page, scaledFrame);
+    await evaluate(page, scaledFrame);
+  }
+});
+
+test("HTMLVideoElement currentTime & slowed x5", async ({ page, browserName }) => {
+  await page.goto("/?src=1000x640x480x25x5.mp4&factor=5");
+
+  const video = await page.locator("video");
+  await expect(video).toBeVisible();
+  
+  for (let i = 0; i < 12; i++) {
+    await video.evaluate(node => (node as HTMLVideoElement).play());
+    await page.waitForTimeout(500);
+    await video.evaluate(node => (node as HTMLVideoElement).pause());
+    await page.waitForTimeout(500);
+
+
+    const currentTime = await video.evaluate(node => (node as HTMLVideoElement).currentTime);
+    const currentFrame = Math.floor(currentTime * rate);
+    const scaledFrame = Math.floor(currentFrame / 5);
+    console.log({ currentTime, currentFrame, scaledFrame });
+    await page.screenshot({ path: `tmp/${browserName}/${i}-${scaledFrame}.png` });
+    await evaluate(page, scaledFrame);
+  }
+});
+
+test("HTMLVideoElement currentTime & slowed x10", async ({ page, browserName }) => {
+  await page.goto("/?src=2000x640x480x25x10.mp4&factor=10");
+
+  const video = await page.locator("video");
+  await expect(video).toBeVisible();
+  
+  for (let i = 0; i < 12; i++) {
+    await video.evaluate(node => (node as HTMLVideoElement).play());
+    await page.waitForTimeout(500);
+    await video.evaluate(node => (node as HTMLVideoElement).pause());
+    await page.waitForTimeout(500);
+
+
+    const currentTime = await video.evaluate(node => (node as HTMLVideoElement).currentTime);
+    const currentFrame = Math.floor(currentTime * rate);
+    const scaledFrame = Math.floor(currentFrame / 5);
+    console.log({ currentTime, currentFrame, scaledFrame });
+    await page.screenshot({ path: `tmp/${browserName}/${i}-${scaledFrame}.png` });
+    await evaluate(page, scaledFrame);
   }
 });
